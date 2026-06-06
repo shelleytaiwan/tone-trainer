@@ -53,12 +53,12 @@
 
   .options{display:grid; grid-template-columns:1fr 1fr; gap:clamp(14px,2.2vw,30px); width:min(94vw,1100px);}
   .option{position:relative; background:var(--card); border:2.5px solid var(--border); border-radius:22px;
-    padding:clamp(8px,1.4vh,16px); cursor:pointer; display:flex; align-items:center; justify-content:center;
-    min-height:clamp(90px,16vh,180px); transition:border-color .1s, transform .1s;}
+    padding:clamp(7px,1.2vh,14px); cursor:pointer; display:flex; align-items:center; justify-content:center;
+    height:clamp(76px,13vh,150px); transition:border-color .1s, transform .1s;}
   .option:hover{border-color:var(--accent);} .option:active{transform:scale(.985);}
   .option svg{width:100%; height:100%;}
   .option .mark{position:absolute; inset:0; display:none; align-items:center; justify-content:center;
-    font-size:clamp(70px,18vh,180px); font-weight:800; pointer-events:none;}
+    font-size:clamp(54px,13vh,130px); font-weight:800; pointer-events:none;}
   .option.correct{border-color:var(--ok);} .option.wrong{border-color:var(--no);}
   .option.correct .mark.ok{display:flex; color:var(--ok);}
   .option.wrong .mark.no{display:flex; color:var(--no);}
@@ -68,19 +68,19 @@
     font-weight:600; cursor:pointer; visibility:hidden;}
   .nextbtn.show{visibility:visible;} .nextbtn:active{transform:scale(.97);}
 
-  #draw .stage{justify-content:flex-start; padding-top:clamp(8px,2vh,22px); gap:clamp(16px,3.5vh,40px);}
+  #draw .stage{justify-content:center; gap:clamp(12px,2.2vh,26px);}
   .answer{width:min(96vw,1100px); background:var(--card); border:2.5px dashed var(--border);
-    border-radius:22px; display:flex; min-height:clamp(130px,27vh,280px); overflow:hidden;}
+    border-radius:22px; display:flex; min-height:clamp(108px,21vh,220px); overflow:hidden;}
   .slot{flex:1; position:relative; cursor:pointer; min-width:0; border-right:1px solid var(--line);}
   .slot:last-child{border-right:none;} .slot.over{background:#eef7f8;}
   .slot svg{width:100%; height:100%; display:block;}
   .palette{display:flex; gap:clamp(10px,1.6vw,22px); flex-wrap:wrap; justify-content:center;}
-  .tile{width:clamp(96px,12vw,150px); height:clamp(74px,11vh,120px); background:var(--card);
+  .tile{width:clamp(82px,10vw,128px); height:clamp(62px,9vh,100px); background:var(--card);
     border:2px solid var(--border); border-radius:18px; cursor:grab; touch-action:none;
     display:flex; align-items:center; justify-content:center;}
   .tile:active{cursor:grabbing;} .tile svg{width:100%; height:100%; pointer-events:none;}
   .ghost{position:fixed; z-index:99; pointer-events:none; opacity:.92;
-    width:clamp(96px,12vw,150px); height:clamp(74px,11vh,120px); background:var(--card);
+    width:clamp(82px,10vw,128px); height:clamp(62px,9vh,100px); background:var(--card);
     border:2px solid var(--accent); border-radius:18px; display:flex; align-items:center; justify-content:center;}
   .ghost svg{width:100%;height:100%;}
   .draw-feedback{position:fixed; inset:0; display:none; align-items:center; justify-content:center;
@@ -167,7 +167,10 @@ function oneSlotSVG(tone,prevTone,color){
 }
 
 /* ---------- 聲音：一律鼻音哼（hmm） ---------- */
-let AC=null;
+let AC=null, COMP=null;
+function out(A){ if(!COMP){COMP=A.createDynamicsCompressor();
+    COMP.threshold.value=-8; COMP.knee.value=4; COMP.ratio.value=12; COMP.attack.value=0.003; COMP.release.value=0.12;
+    COMP.connect(A.destination);} return COMP; }
 function ac(){ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended') AC.resume(); return AC; }
 function f0(level,center){ return center*Math.pow(2,(level-3)*3.2/12); }
 const CONTOUR={ 1:[[0,4.8],[1,4.8]], 2:[[0,2.8],[1,4.9]], 3:[[0,2.0],[0.45,1.2],[1,1.2]], 4:[[0,5.0],[1,1.0]] };
@@ -179,7 +182,7 @@ function playOne(tone,when,center,dur,prevTone){
   const N=50, freq=new Float32Array(N);
   for(let i=0;i<N;i++) freq[i]=f0(levelAt(pts,i/(N-1)),center);
   const osc=A.createOscillator(); osc.type='sawtooth'; osc.frequency.setValueCurveAtTime(freq,when,dur);
-  const master=A.createGain(); const peak=isN?0.10:0.16;
+  const master=A.createGain(); const peak=isN?0.42:0.62;
   master.gain.setValueAtTime(0.0001,when);
   master.gain.exponentialRampToValueAtTime(peak,when+0.05);
   master.gain.setValueAtTime(peak,when+Math.max(0.06,dur-0.09));
@@ -188,7 +191,7 @@ function playOne(tone,when,center,dur,prevTone){
   NASAL.forEach(([fc,g])=>{const bp=A.createBiquadFilter();bp.type='bandpass';bp.frequency.value=fc;bp.Q.value=7;
     const fg=A.createGain();fg.gain.value=g;osc.connect(bp);bp.connect(fg);fg.connect(sum);});
   const lp=A.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1300;
-  sum.connect(master); master.connect(lp); lp.connect(A.destination);
+  sum.connect(master); master.connect(lp); lp.connect(out(A));
   osc.start(when); osc.stop(when+dur+0.02);
 }
 function playTones(tones,{reg='高',slow=false}={}){
