@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>辨別聲調</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@700;900&display=swap">
 <style>
   :root{
     color-scheme:light;
@@ -44,6 +44,8 @@
   #home,#sub{overflow-y:auto;}
   .cover-inner{margin:auto; text-align:center; width:100%;}
   .title{font-family:"Noto Serif TC","Songti TC","PMingLiU",serif; font-size:clamp(40px,9vh,96px); font-weight:900; letter-spacing:.08em; line-height:1.2; margin-bottom:clamp(14px,3vh,32px);}
+  html[lang="zh-Hans"] body{font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;}
+  html[lang="zh-Hans"] .title{font-family:"Noto Serif SC","Songti SC","SimSun",serif;}
   .cover-inner .pills{justify-content:center; margin-bottom:clamp(20px,5vh,56px);}
   .homelink,.backtop{position:absolute; z-index:5;
     top:calc(max(10px,env(safe-area-inset-top)) + clamp(10px,1.6vh,18px));
